@@ -15,7 +15,6 @@ export default function useTimeout(callback : () => any, delay : number, depende
         savedCallback.current = callback;
     }, [callback]);
 
-    // Set up the interval.
     useEffect(() => {
         function tick() {
             savedCallback.current();

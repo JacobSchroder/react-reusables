@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import {Select} from "./components/Select";
+import useInterval from "./hooks/useInterval";
 
 const options = {
     1 : "en",
@@ -9,6 +10,7 @@ const options = {
 }
 
 function App() {
+
   return (
     <div className="App">
       <Select options={options} placeholder={'vælg nu'}>
