@@ -2,7 +2,6 @@ import React, {useRef, useState} from "react";
 import styled, {css} from 'styled-components';
 import {shadow1} from "../theme";
 import useClickAway from "../hooks/useClickAway";
-import useKeyPress from "../hooks/useKeyPress";
 
 interface Dictionary<T> {
     [Key: string]: T;
@@ -11,6 +10,7 @@ interface Dictionary<T> {
 interface Props {
     options : Dictionary<JSX.Element | string>,
     placeholder ?: string,
+    tabIndex ?: number,
 }
 
 interface OptionProps {
@@ -34,10 +34,13 @@ const Option = styled.div`
        opacity : .8;
     `}
     
-    font-weight : ${(props : OptionProps) => props.selected ? 'bold' : 'normal'};
+    ${(props : OptionProps) => props.selected && `
+        font-weight: bold;
+        background-color : #f6f6f6;
+    `};
     
     &:hover {
-        background-color : #eeeeee;
+        background-color : #f0f0f0;
     }
 `
 
@@ -66,18 +69,18 @@ const Selector = styled.div`
 `
 
 export const Select : React.FC<Props> = (props) => {
-    const {children, options, placeholder = "vælg"} = props;
+    const {children, options, placeholder = "vælg", tabIndex = 0} = props;
     const [open, setOpen] = useState<boolean>(false);
     const [selected, setSelected] = useState<string | null>(null);
 
     const optionsRef = useRef<HTMLDivElement>(null);
     const selectorRef = useRef<HTMLDivElement>(null);
-    const hide = () => setOpen(false);
 
+    const hide = () => setOpen(false);
     useClickAway([optionsRef, selectorRef], hide);
-    useKeyPress(hide, ["Escape", "Enter"]);
 
     const arrowNav = (key : string) => {
+        if (!open) return;
         const optionKeys = Object.keys(options);
         let index = !selected ? -1 : optionKeys.indexOf(selected);
         if (key === "ArrowDown") index = (index + 1) % optionKeys.length;
@@ -85,7 +88,12 @@ export const Select : React.FC<Props> = (props) => {
         else index = (index - 1) % optionKeys.length;
         setSelected(optionKeys[index]);
     }
-    useKeyPress(arrowNav, ["ArrowDown", "ArrowUp"])
+    const keyPressHandler = (e : any) => {
+        const {key} = e;
+        if(["ArrowDown", "ArrowUp"].includes(key)) return arrowNav(key);
+        if(key === "Escape") return hide();
+        if(key === "Enter") return toggleOpen();
+    }
 
     const toggleOpen = () => setOpen(p => !p);
     const toggleSelection = (key : string) => {
@@ -98,7 +106,7 @@ export const Select : React.FC<Props> = (props) => {
     return (
         <Wrapper>
             {children && <label style={{paddingLeft: 10}}>children</label>}
-            <Selector onClick={toggleOpen} ref={selectorRef}>
+            <Selector tabIndex={tabIndex} onClick={toggleOpen} ref={selectorRef} onKeyDown={keyPressHandler}>
                 {selectedLabel || placeholder}
             </Selector>
             {open &&
