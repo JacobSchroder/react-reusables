@@ -1,11 +1,17 @@
 import {useEffect} from "react";
 
-export default function useClickAway(refs, handler, clickType = "mousedown") {
+/**
+ * Trigger handler function when user clicks outside Ref(s)
+ * @param refs React Ref or array of React Refs. Clicking outside this/theese refs triggers the ClickOutside handler.
+ * @param handler function to call when clicking outside Ref(s)
+ * @param clickType "mousedown" or "mouseup"
+ */
+export default function useClickAway(refs : any, handler : () => any, clickType : "mousedown" | "mouseup" = "mousedown") : void{
     useEffect(() => {
 
         if (!!refs && !Array.isArray(refs)) refs = [refs];
 
-        function handleClickOutside(event) {
+        function handleClickOutside(event : MouseEvent) {
             if (!refs) {
                 handler();
                 return true;
@@ -19,10 +25,8 @@ export default function useClickAway(refs, handler, clickType = "mousedown") {
             return true;
         }
 
-        // Bind the event listener
         document.addEventListener(clickType, handleClickOutside);
         return () => {
-            // Unbind the event listener on clean up
             document.removeEventListener(clickType, handleClickOutside);
         };
     }, [refs, handler, clickType]);

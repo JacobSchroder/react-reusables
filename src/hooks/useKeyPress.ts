@@ -1,7 +1,12 @@
 import {useEffect} from "react";
 
-
-export default function useKeyPress(handler : (key?: any) => any, pressType : string = "keydown", el : any = document) {
+/**
+ * Listen for KeyBoard events with handler function
+ * @param handler function to call onKeyPress
+ * @param pressType "keydown" | "keyup"
+ * @param [el] HTML element on which to bind event listener
+ */
+export default function useKeyPress(handler : (key?: any) => any, pressType : "keydown" | "keyup" = "keydown", el : any = document) {
     useEffect(() => {
 
         // Bind the event listener
